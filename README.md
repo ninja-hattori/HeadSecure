@@ -17,6 +17,8 @@ cd HeadSecure
 ```shell
 pip install -r requirements.txt
 ```
+
+## USAGE
 ```shell
 python3 headsecure.py
 ```
