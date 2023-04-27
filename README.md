@@ -21,5 +21,5 @@ pip install -r requirements.txt
 python3 headsecure.py
 ```
 
-##EXAMPLE
+## EXAMPLE
 ![image](https://user-images.githubusercontent.com/112231923/234761323-7c6fff12-6b66-4c46-8372-b0cb20c2a591.png)
