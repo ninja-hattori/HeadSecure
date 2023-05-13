@@ -1,31 +1,64 @@
-from print_color import print
-import requests
+import urllib.request
 import os
+import ssl
 
+# Define Colors
+red = "\u001b[38;5;160m"
+green = "\033[0;32m"
+yellow = "\u001b[38;5;184m"
+cyan = "\033[36m"
+nocolor = "\033[0m"
 
 # header for the script
 def header():
     # go to https://fsymbols.com/generators/tarty/ and get the name of the tool in this font
+    print(cyan, end='')
     print("""
     ██╗░░██╗███████╗░█████╗░██████╗░░██████╗███████╗░█████╗░██╗░░░██╗██████╗░███████╗
     ██║░░██║██╔════╝██╔══██╗██╔══██╗██╔════╝██╔════╝██╔══██╗██║░░░██║██╔══██╗██╔════╝
     ███████║█████╗░░███████║██║░░██║╚█████╗░█████╗░░██║░░╚═╝██║░░░██║██████╔╝█████╗░░
     ██╔══██║██╔══╝░░██╔══██║██║░░██║░╚═══██╗██╔══╝░░██║░░██╗██║░░░██║██╔══██╗██╔══╝░░
     ██║░░██║███████╗██║░░██║██████╔╝██████╔╝███████╗╚█████╔╝╚██████╔╝██║░░██║███████╗
-    ╚═╝░░╚═╝╚══════╝╚═╝░░╚═╝╚═════╝░╚═════╝░╚══════╝░╚════╝░░╚═════╝░╚═╝░░╚═╝╚══════╝""", color='blue')
+    ╚═╝░░╚═╝╚══════╝╚═╝░░╚═╝╚═════╝░╚═════╝░╚══════╝░╚════╝░░╚═════╝░╚═╝░░╚═╝╚══════╝""")
+    print(nocolor, end='')
     print("""
                 █▄▄ █▄█   █▄░█ █ █▄░█ ░░█ ▄▀█   █░█ ▄▀█ ▀█▀ ▀█▀ █▀█ █▀█ █
                 █▄█ ░█░   █░▀█ █ █░▀█ █▄█ █▀█   █▀█ █▀█ ░█░ ░█░ █▄█ █▀▄ █""")
 
-
 def header_check(url):
     # url = 'https://github.com'
 
-    # Send a request to the URL
-    response = requests.get(url)
-
-    # Get the headers from the response
-    headers = response.headers
+    # Send a default request to the URL
+    try:
+        response = urllib.request.urlopen(url)
+    except urllib.error.URLError as e:
+        if isinstance(e.reason, ssl.SSLError) and 'CERTIFICATE_VERIFY_FAILED' in str(e.reason):
+                # Create context and make requests to the URL with the SSL check bypass
+                print(yellow)
+                print('This website is using an Expired or Untrusted SSL certificate.\n')
+                context = ssl.create_default_context()
+                context.check_hostname = False
+                context.verify_mode = ssl.CERT_NONE
+                response = urllib.request.urlopen(url, context=context)
+        else:
+                print(red, end="")
+                print("Unwanted Error occurred in request\nDebug:\n",e)
+                return
+    except Exception as e:
+        print(red, end="")
+        print("Unwanted Error occurred in request\nDebug:\n",e)
+        return
+    try:
+        # Get the headers from the response
+        headers = response.info()
+        headers = response.headers
+    except:
+        print(red, end="")
+        print("Error in crawl request")
+        return
+    finally:
+        # Make sure to close the response
+        response.close()
 
     # List of all possible headers
     security_headers = ['X-Frame-Options', 'X-XSS-Protection', 'X-Content-Type-Options',
@@ -156,12 +189,15 @@ This header is deprecated and should not be used anymore.
 
     for header in security_headers:
         if header in headers:
-            print(f"{header}: {headers[header]}", color="red", format="bold")
-            print(f"{header_recom[header]}", color="green", format="bold")
+            print(red, end='')
+            print(f"\033[1m{header}: {headers[header]}\033[0m")
+            print(green, end='')
+            print(f"\033[1m{header_recom[header]}\033[0m")
         else:
-            print(f"{header} header not found.", color="red", format="bold")
-            print(f"{header_recom[header]}", color="green", format="bold")
-
+            print(red, end='')
+            print(f"\033[1m{header} header not found.\033[0m")
+            print(green, end='')
+            print(f"\033[1m{header_recom[header]}\033[0m")
 
 # main function
 if __name__ == "__main__":
@@ -174,3 +210,5 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         done = True
         print("\r!!KEYBOARD INTERRUPT!!")
+        print(nocolor,end='')
+    print(nocolor,end='')

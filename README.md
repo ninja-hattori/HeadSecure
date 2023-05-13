@@ -14,9 +14,6 @@ git clone https://github.com/ninja-hattori/HeadSecure.git
 ```shell
 cd HeadSecure
 ```
-```shell
-pip install -r requirements.txt
-```
 
 ## USAGE
 ```shell
